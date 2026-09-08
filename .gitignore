@@ -1,0 +1,41 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+
+# Test output
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Logs
+logs/
+*.log
+
+# Local secrets / configuration
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Data Protection keys
+keys/
+DataProtection-Keys/
+
+# SQL Server local database files
+*.mdf
+*.ldf
+
+# NuGet packages
+packages/
+*.nupkg
+
+# OS generated files
+Thumbs.db
+.DS_Store

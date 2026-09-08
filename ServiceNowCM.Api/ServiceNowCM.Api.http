@@ -1,0 +1,6 @@
+@ServiceNowCM.Api_HostAddress = http://localhost:5105
+
+GET {{ServiceNowCM.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ServiceNowCM.Application\ServiceNowCM.Application.csproj" />
+    <ProjectReference Include="..\ServiceNowCM.Domain\ServiceNowCM.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="TRIM.SDK">
+      <HintPath>..\..\..\..\..\..\..\Program Files\Micro Focus\Content Manager\TRIM.SDK.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
