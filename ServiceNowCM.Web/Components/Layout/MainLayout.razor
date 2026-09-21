@@ -1,19 +1,61 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
+<div class="app-shell">
+
+    <aside class="sidebar">
         <NavMenu />
-    </div>
+    </aside>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+    <section class="main-area">
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+        <header class="app-header">
+
+            <div class="header-left">
+
+                <div class="application-name">
+                    ServiceNow → Content Manager Connector
+                </div>
+
+                <span class="environment-badge">
+                    Development
+                </span>
+
+            </div>
+
+            <div class="header-right">
+
+                <div class="system-status">
+                    <span class="status-indicator"></span>
+                    <span>Connector UI</span>
+                </div>
+
+                <div class="user-section">
+
+                    <div class="user-avatar">
+                        A
+                    </div>
+
+                    <div class="user-information">
+                        <span class="user-name">Administrator</span>
+                        <span class="user-role">Connector Admin</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <main class="page-content">
+
+            <div class="content-container">
+                @Body
+            </div>
+
+        </main>
+
+    </section>
+
 </div>
 
 <div id="blazor-error-ui">
