@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceNowCM.Api", "Service
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceNowCM.ContentManager", "ServiceNowCM.ContentManager\ServiceNowCM.ContentManager.csproj", "{31AC510B-4A37-4FF0-878C-3D7CE33CEC4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceNowCM.Web", "ServiceNowCM.Web\ServiceNowCM.Web.csproj", "{01E9E6E7-315C-4025-9E6D-B51594FB37EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{31AC510B-4A37-4FF0-878C-3D7CE33CEC4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31AC510B-4A37-4FF0-878C-3D7CE33CEC4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31AC510B-4A37-4FF0-878C-3D7CE33CEC4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01E9E6E7-315C-4025-9E6D-B51594FB37EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01E9E6E7-315C-4025-9E6D-B51594FB37EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01E9E6E7-315C-4025-9E6D-B51594FB37EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01E9E6E7-315C-4025-9E6D-B51594FB37EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
