@@ -1,0 +1,417 @@
+﻿@page "/"
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="dashboard-page">
+
+    <div class="page-heading">
+        <div>
+            <h1>Dashboard</h1>
+            <p>
+                Overview of ServiceNow to Content Manager synchronization activities.
+            </p>
+        </div>
+
+        <button class="refresh-button">
+            ↻ Refresh
+        </button>
+    </div>
+
+
+    <!-- SUMMARY CARDS -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+            <div class="summary-icon processed-icon">
+                ▤
+            </div>
+
+            <div class="summary-content">
+                <span class="summary-label">
+                    Total Processed
+                </span>
+
+                <strong class="summary-value">
+                    1,245,321
+                </strong>
+
+                <span class="summary-note">
+                    Across all integrations
+                </span>
+            </div>
+        </div>
+
+
+        <div class="summary-card">
+            <div class="summary-icon success-icon">
+                ✓
+            </div>
+
+            <div class="summary-content">
+                <span class="summary-label">
+                    Successful
+                </span>
+
+                <strong class="summary-value">
+                    1,240,112
+                </strong>
+
+                <span class="summary-note success-text">
+                    99.6% success rate
+                </span>
+            </div>
+        </div>
+
+
+        <div class="summary-card">
+            <div class="summary-icon failure-icon">
+                !
+            </div>
+
+            <div class="summary-content">
+                <span class="summary-label">
+                    Failed
+                </span>
+
+                <strong class="summary-value">
+                    82
+                </strong>
+
+                <span class="summary-note failure-text">
+                    Requires attention
+                </span>
+            </div>
+        </div>
+
+
+        <div class="summary-card">
+            <div class="summary-icon running-icon">
+                ▶
+            </div>
+
+            <div class="summary-content">
+                <span class="summary-label">
+                    Running
+                </span>
+
+                <strong class="summary-value">
+                    3
+                </strong>
+
+                <span class="summary-note">
+                    Active synchronization jobs
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- MAIN DASHBOARD GRID -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- RECENT JOBS -->
+
+        <section class="panel recent-jobs-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2>Recent Synchronization Jobs</h2>
+                    <p>Latest connector processing activity.</p>
+                </div>
+
+                <a href="/jobs" class="panel-link">
+                    View all jobs →
+                </a>
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="dashboard-table">
+
+                    <thead>
+                        <tr>
+                            <th>Job</th>
+                            <th>Integration</th>
+                            <th>Status</th>
+                            <th>Processed</th>
+                            <th>Succeeded</th>
+                            <th>Failed</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>#2107</td>
+                            <td>Belgium HR Case</td>
+                            <td>
+                                <span class="status-badge running">
+                                    Running
+                                </span>
+                            </td>
+                            <td>18,321</td>
+                            <td>18,300</td>
+                            <td>5</td>
+                        </tr>
+
+                        <tr>
+                            <td>#2106</td>
+                            <td>UKI HR Case</td>
+                            <td>
+                                <span class="status-badge completed">
+                                    Completed
+                                </span>
+                            </td>
+                            <td>45,234</td>
+                            <td>45,210</td>
+                            <td>12</td>
+                        </tr>
+
+                        <tr>
+                            <td>#2105</td>
+                            <td>Incident Archive</td>
+                            <td>
+                                <span class="status-badge warning">
+                                    With Failures
+                                </span>
+                            </td>
+                            <td>12,110</td>
+                            <td>11,980</td>
+                            <td>130</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- SYSTEM HEALTH -->
+
+        <section class="panel health-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2>System Health</h2>
+                    <p>Current connector component status.</p>
+                </div>
+            </div>
+
+
+            <div class="health-list">
+
+                <div class="health-item">
+
+                    <div>
+                        <strong>ServiceNow</strong>
+                        <span>Corporate instance</span>
+                    </div>
+
+                    <span class="health-status healthy">
+                        ● Available
+                    </span>
+
+                </div>
+
+
+                <div class="health-item">
+
+                    <div>
+                        <strong>Content Manager</strong>
+                        <span>Global CM dataset</span>
+                    </div>
+
+                    <span class="health-status healthy">
+                        ● Available
+                    </span>
+
+                </div>
+
+
+                <div class="health-item">
+
+                    <div>
+                        <strong>SQL Server</strong>
+                        <span>Connector database</span>
+                    </div>
+
+                    <span class="health-status healthy">
+                        ● Available
+                    </span>
+
+                </div>
+
+
+                <div class="health-item">
+
+                    <div>
+                        <strong>Worker Service</strong>
+                        <span>Synchronization processor</span>
+                    </div>
+
+                    <span class="health-status healthy">
+                        ● Running
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- BOTTOM GRID -->
+
+    <div class="dashboard-grid bottom-grid">
+
+
+        <!-- ACTIVE INTEGRATIONS -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2>Active Integrations</h2>
+                    <p>Configured ServiceNow to Content Manager flows.</p>
+                </div>
+
+                <a href="/integrations"
+                   class="panel-link">
+                    Manage →
+                </a>
+            </div>
+
+
+            <div class="integration-list">
+
+                <div class="integration-item">
+
+                    <div>
+                        <strong>Belgium HR Case</strong>
+                        <span>hr_case → HR Case</span>
+                    </div>
+
+                    <span class="integration-status">
+                        Active
+                    </span>
+
+                </div>
+
+
+                <div class="integration-item">
+
+                    <div>
+                        <strong>UKI HR Case</strong>
+                        <span>hr_case → HR Case</span>
+                    </div>
+
+                    <span class="integration-status">
+                        Active
+                    </span>
+
+                </div>
+
+
+                <div class="integration-item">
+
+                    <div>
+                        <strong>Incident Archive</strong>
+                        <span>incident → Incident</span>
+                    </div>
+
+                    <span class="integration-status">
+                        Active
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- FAILURE SUMMARY -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>Failed Transactions</h2>
+                    <p>Latest records requiring attention.</p>
+                </div>
+
+                <a href="/failures"
+                   class="panel-link">
+                    View failures →
+                </a>
+
+            </div>
+
+
+            <div class="failure-list">
+
+                <div class="failure-item">
+
+                    <div>
+                        <strong>HR12345</strong>
+                        <span>Content Manager validation failure</span>
+                    </div>
+
+                    <span class="failure-category">
+                        ContentManager
+                    </span>
+
+                </div>
+
+
+                <div class="failure-item">
+
+                    <div>
+                        <strong>HR12348</strong>
+                        <span>Mandatory metadata missing</span>
+                    </div>
+
+                    <span class="failure-category">
+                        Validation
+                    </span>
+
+                </div>
+
+
+                <div class="failure-item">
+
+                    <div>
+                        <strong>INC0012345</strong>
+                        <span>Attachment synchronization failure</span>
+                    </div>
+
+                    <span class="failure-category">
+                        Attachment
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="sample-data-notice">
+        Dashboard currently displays sample UI data.
+        Live connector statistics will be connected in a later implementation step.
+    </div>
+
+</div>

@@ -1,0 +1,317 @@
+﻿/* =========================================================
+   SERVICENOW → CONTENT MANAGER CONNECTOR
+   LEFT NAVIGATION
+========================================================= */
+
+
+/* ---------------------------------------------------------
+   BRAND / LOGO AREA
+--------------------------------------------------------- */
+
+.top-row {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    background: #0d314d;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+    .top-row .container-fluid {
+        padding-left: 22px;
+        padding-right: 18px;
+    }
+
+.navbar-brand {
+    display: flex;
+    flex-direction: column;
+    color: #ffffff;
+    text-decoration: none;
+    line-height: 1.15;
+    margin: 0;
+    padding: 0;
+}
+
+    .navbar-brand:hover {
+        color: #ffffff;
+    }
+
+.brand-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    width: 100%;
+}
+
+.brand-logo-wrapper {
+    width: 85px;
+    height: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.brand-logo {
+    max-width: 80px;
+    max-height: 80px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.brand-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+}
+
+.brand-subtitle {
+    margin-top: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #a9c4d7;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE MENU BUTTON
+--------------------------------------------------------- */
+
+.navbar-toggler {
+    appearance: none;
+    cursor: pointer;
+    width: 42px;
+    height: 36px;
+    position: absolute;
+    top: 19px;
+    right: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 5px;
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/22px rgba(255, 255, 255, 0.06);
+}
+
+    .navbar-toggler:hover {
+        background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .navbar-toggler:checked {
+        background-color: rgba(255, 255, 255, 0.18);
+    }
+
+
+/* ---------------------------------------------------------
+   NAVIGATION CONTAINER
+--------------------------------------------------------- */
+
+.nav-scrollable {
+    display: none;
+    padding-top: 14px;
+    padding-bottom: 24px;
+}
+
+
+/* ---------------------------------------------------------
+   SECTION HEADINGS
+--------------------------------------------------------- */
+
+.nav-section-title {
+    margin-top: 22px;
+    margin-bottom: 8px;
+    padding-left: 24px;
+    padding-right: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #7898af;
+    text-transform: uppercase;
+}
+
+
+/* ---------------------------------------------------------
+   NAV ITEMS
+--------------------------------------------------------- */
+
+.nav-item {
+    font-size: 13px;
+    padding: 2px 12px;
+}
+
+    .nav-item:first-of-type {
+        padding-top: 2px;
+    }
+
+    .nav-item:last-of-type {
+        padding-bottom: 14px;
+    }
+
+
+    /* ---------------------------------------------------------
+   NAV LINKS
+--------------------------------------------------------- */
+
+    .nav-item ::deep .nav-link {
+        width: 100%;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 14px;
+        border-radius: 6px;
+        background: transparent;
+        color: #cbdbe7;
+        text-decoration: none;
+        border: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+
+
+/* ---------------------------------------------------------
+   NAV ICON / SYMBOL
+--------------------------------------------------------- */
+
+.nav-symbol {
+    width: 21px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #98b7cc;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+
+/* ---------------------------------------------------------
+   HOVER STATE
+--------------------------------------------------------- */
+
+.nav-item ::deep .nav-link:hover {
+    background: rgba(255, 255, 255, 0.075);
+    color: #ffffff;
+}
+
+    .nav-item ::deep .nav-link:hover .nav-symbol {
+        color: #ffffff;
+    }
+
+
+/* ---------------------------------------------------------
+   ACTIVE NAVIGATION ITEM
+--------------------------------------------------------- */
+
+.nav-item ::deep a.active {
+    background: #1e6696;
+    color: #ffffff;
+    box-shadow: inset 3px 0 0 #65b8eb;
+}
+
+    .nav-item ::deep a.active .nav-symbol {
+        color: #ffffff;
+    }
+
+
+/* ---------------------------------------------------------
+   OPTIONAL FOCUS STATE
+--------------------------------------------------------- */
+
+.nav-item ::deep .nav-link:focus-visible {
+    outline: 2px solid #6bb9e8;
+    outline-offset: 2px;
+}
+
+
+/* ---------------------------------------------------------
+   SCROLLBAR
+--------------------------------------------------------- */
+
+.nav-scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+
+.nav-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.nav-scrollable::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 4px;
+}
+
+    .nav-scrollable::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.26);
+    }
+
+
+/* ---------------------------------------------------------
+   CHECKBOX / MOBILE MENU BEHAVIOUR
+--------------------------------------------------------- */
+
+.navbar-toggler:checked ~ .nav-scrollable {
+    display: block;
+}
+
+
+/* ---------------------------------------------------------
+   DESKTOP
+--------------------------------------------------------- */
+
+@media (min-width: 701px) {
+
+    .navbar-toggler {
+        display: none;
+    }
+
+    .nav-scrollable {
+        display: block;
+        height: calc(100vh - 76px);
+        overflow-y: auto;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE / SMALL SCREEN
+--------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    .top-row {
+        min-height: 66px;
+    }
+
+    .brand-title {
+        font-size: 15px;
+    }
+
+    .brand-subtitle {
+        font-size: 10px;
+    }
+
+    .navbar-toggler {
+        top: 15px;
+    }
+
+    .nav-scrollable {
+        max-height: calc(100vh - 66px);
+        overflow-y: auto;
+        background: #123b5d;
+    }
+
+    .nav-section-title {
+        margin-top: 16px;
+    }
+}

@@ -1,0 +1,106 @@
+﻿<div class="top-row navbar navbar-dark">
+    <div class="container-fluid">
+
+        <a class="navbar-brand brand-container" href="">
+
+            <div class="brand-logo-wrapper">
+                <img src="images/opentext-logo-white.png"
+                     alt="OpenText"
+                     class="brand-logo" />
+            </div>
+
+            <div class="brand-text">
+                <div class="brand-title">
+                    ServiceNow - CM
+                </div>
+
+                <div class="brand-subtitle">
+                    Connector
+                </div>
+            </div>
+
+        </a>
+
+    </div>
+</div>
+
+<input type="checkbox"
+       title="Navigation menu"
+       class="navbar-toggler" />
+
+<div class="nav-scrollable"
+     onclick="document.querySelector('.navbar-toggler').click()">
+
+    <nav class="flex-column">
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link"
+                     href=""
+                     Match="NavLinkMatch.All">
+                <span class="nav-symbol" aria-hidden="true">▦</span>
+                Dashboard
+            </NavLink>
+        </div>
+
+        <div class="nav-section-title">
+            CONFIGURATION
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link"
+                     href="connections">
+                <span class="nav-symbol" aria-hidden="true">⛓</span>
+                Connections
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link"
+                     href="integrations">
+                <span class="nav-symbol" aria-hidden="true">⇄</span>
+                Integrations
+            </NavLink>
+        </div>
+
+        <div class="nav-section-title">
+            OPERATIONS
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link"
+                     href="jobs">
+                <span class="nav-symbol" aria-hidden="true">▶</span>
+                Jobs
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link"
+                     href="failures">
+                <span class="nav-symbol" aria-hidden="true">!</span>
+                Failures
+            </NavLink>
+        </div>
+
+        <div class="nav-section-title">
+            ADMINISTRATION
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link"
+                     href="audit">
+                <span class="nav-symbol" aria-hidden="true">≡</span>
+                Audit
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link"
+                     href="settings">
+                <span class="nav-symbol" aria-hidden="true">⚙</span>
+                Settings
+            </NavLink>
+        </div>
+
+    </nav>
+</div>

@@ -1,0 +1,254 @@
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    background: #f4f7fb;
+}
+
+/* ---------------------------------------------------------
+   LEFT SIDEBAR
+--------------------------------------------------------- */
+
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    min-height: 100vh;
+    background: #123b5d;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ---------------------------------------------------------
+   MAIN APPLICATION AREA
+--------------------------------------------------------- */
+
+.main-area {
+    flex: 1;
+    min-width: 0;
+    margin-left: 260px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+
+/* ---------------------------------------------------------
+   TOP APPLICATION HEADER
+--------------------------------------------------------- */
+
+.app-header {
+    height: 64px;
+    background: #ffffff;
+    border-bottom: 1px solid #dfe6ee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+
+/* ---------------------------------------------------------
+   HEADER LEFT
+--------------------------------------------------------- */
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.application-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #24364b;
+    white-space: nowrap;
+}
+
+.environment-badge {
+    background: #edf4fb;
+    color: #245e8a;
+    border: 1px solid #ccddec;
+    padding: 4px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* ---------------------------------------------------------
+   HEADER RIGHT
+--------------------------------------------------------- */
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+
+/* ---------------------------------------------------------
+   SYSTEM STATUS
+--------------------------------------------------------- */
+
+.system-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: #607286;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #29a36a;
+    box-shadow: 0 0 0 3px rgba(41, 163, 106, 0.12);
+}
+
+
+/* ---------------------------------------------------------
+   USER AREA
+--------------------------------------------------------- */
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #1c6ca1;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.user-information {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #25364a;
+}
+
+.user-role {
+    font-size: 11px;
+    color: #7a8998;
+}
+
+
+/* ---------------------------------------------------------
+   PAGE CONTENT
+--------------------------------------------------------- */
+
+.page-content {
+    flex: 1;
+    padding: 28px;
+    background: #f4f7fb;
+}
+
+.content-container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+
+/* ---------------------------------------------------------
+   BLAZOR ERROR UI
+--------------------------------------------------------- */
+
+#blazor-error-ui {
+    background: #fff3cd;
+    bottom: 0;
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.15);
+    display: none;
+    left: 0;
+    padding: 0.75rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 2000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+    }
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------- */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 220px;
+        min-width: 220px;
+    }
+
+    .main-area {
+        margin-left: 220px;
+    }
+
+    .application-name {
+        font-size: 14px;
+    }
+
+    .user-information {
+        display: none;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        min-width: 100%;
+        min-height: auto;
+    }
+
+    .app-shell {
+        display: block;
+    }
+
+    .main-area {
+        margin-left: 0;
+    }
+
+    .app-header {
+        padding: 0 16px;
+    }
+
+    .environment-badge,
+    .system-status {
+        display: none;
+    }
+
+    .page-content {
+        padding: 18px;
+    }
+}
