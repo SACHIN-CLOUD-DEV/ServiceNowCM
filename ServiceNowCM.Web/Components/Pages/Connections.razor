@@ -2,8 +2,1079 @@
 
 <PageTitle>Connections</PageTitle>
 
-<h1>Connections</h1>
+<div class="connections-page">
 
-<p>
-    Configure and manage ServiceNow and Content Manager connections.
-</p>
+    <!-- =====================================================
+         PAGE HEADING
+    ====================================================== -->
+
+    <div class="page-heading">
+
+        <div>
+            <h1>Connections</h1>
+
+            <p>
+                Configure and manage ServiceNow and OpenText Content Manager connections.
+            </p>
+        </div>
+
+        <button type="button"
+                class="primary-button"
+                @onclick="ToggleEditor">
+
+            + Add Connection
+
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         CONNECTION SUMMARY
+    ====================================================== -->
+
+    <div class="connection-summary">
+
+        <div class="summary-item">
+
+            <span class="summary-number">
+                @serviceNowConnections.Count
+            </span>
+
+            <div>
+                <strong>ServiceNow</strong>
+                <span>Configured connections</span>
+            </div>
+
+        </div>
+
+
+        <div class="summary-divider"></div>
+
+
+        <div class="summary-item">
+
+            <span class="summary-number">
+                @contentManagerConnections.Count
+            </span>
+
+            <div>
+                <strong>Content Manager</strong>
+                <span>Configured connections</span>
+            </div>
+
+        </div>
+
+
+        <div class="summary-divider"></div>
+
+
+        <div class="summary-item">
+
+            <span class="health-dot @(AllConnectionsHealthy ? "" : "unhealthy")">
+            </span>
+
+            <div>
+
+                <strong>
+                    Connection Health
+                </strong>
+
+                <span>
+                    @(AllConnectionsHealthy
+                                        ? "All configured systems available"
+                                        : "One or more connections require attention")
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CONNECTION TABS
+    ====================================================== -->
+
+    <div class="connection-tabs">
+
+        <button type="button"
+                class="tab-button @(activeTab == "servicenow" ? "active" : "")"
+                @onclick="ShowServiceNow">
+
+            ServiceNow Connections
+
+        </button>
+
+
+        <button type="button"
+                class="tab-button @(activeTab == "contentmanager" ? "active" : "")"
+                @onclick="ShowContentManager">
+
+            Content Manager Connections
+
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         SERVICENOW CONNECTIONS
+    ====================================================== -->
+    @if (activeTab == "servicenow")
+    {
+        <section class="connection-panel">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <h2>
+                        ServiceNow Connections
+                    </h2>
+
+                    <p>
+                        Manage ServiceNow instances and authentication configuration.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="connection-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Name</th>
+                            <th>Instance URL</th>
+                            <th>Authentication</th>
+                            <th>Status</th>
+                            <th>Last Tested</th>
+                            <th class="actions-column">Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var connection in serviceNowConnections)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    <div class="connection-name">
+
+                                        <strong>
+                                            @connection.Name
+                                        </strong>
+
+                                        <span>
+                                            @connection.Description
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="server-value">
+                                        @connection.InstanceUrl
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="auth-badge">
+                                        @connection.AuthenticationType
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    @if (connection.IsOnline)
+                                    {
+                                        <span class="status-badge online">
+                                            ● Online
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge offline">
+                                            ● Offline
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td>
+                                    @connection.LastTested
+                                </td>
+
+
+                                <td>
+
+                                    <div class="action-group">
+
+                                        <button type="button"
+                                                class="action-button test-button">
+
+                                            Test
+
+                                        </button>
+
+
+                                        <button type="button"
+                                                class="action-button">
+
+                                            Edit
+
+                                        </button>
+
+
+                                        <button type="button"
+                                                class="action-button danger">
+
+                                            Delete
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ADD SERVICENOW CONNECTION
+        ================================================== -->
+        @if (showEditor)
+        {
+            <section class="connection-editor">
+
+                <div class="editor-heading">
+
+                    <div>
+
+                        <h2>
+                            Add ServiceNow Connection
+                        </h2>
+
+                        <p>
+                            Configure the ServiceNow instance and authentication details.
+                        </p>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="close-button"
+                            @onclick="CloseEditor">
+
+                        ×
+
+                    </button>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <!-- CONNECTION NAME -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Connection Name
+                            <span>*</span>
+                        </label>
+
+                        <input type="text"
+                               @bind="serviceNowForm.Name"
+                               placeholder="e.g. Corporate ServiceNow" />
+
+                    </div>
+
+
+                    <!-- INSTANCE URL -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Instance URL
+                            <span>*</span>
+                        </label>
+
+                        <input type="text"
+                               @bind="serviceNowForm.InstanceUrl"
+                               placeholder="https://company.service-now.com" />
+
+                    </div>
+
+
+                    <!-- AUTHENTICATION TYPE -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Authentication Type
+                            <span>*</span>
+                        </label>
+
+                        <select @bind="serviceNowForm.AuthenticationType">
+
+                            <option value="Basic">
+                                Basic Authentication
+                            </option>
+
+                            <option value="OAuth2">
+                                OAuth 2.0
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- BASIC AUTHENTICATION -->
+                    @if (serviceNowForm.AuthenticationType == "Basic")
+                    {
+                        <div class="form-field">
+
+                            <label>
+                                Username
+                                <span>*</span>
+                            </label>
+
+                            <input type="text"
+                                   @bind="serviceNowForm.Username"
+                                   placeholder="ServiceNow username" />
+
+                        </div>
+
+
+                        <div class="form-field full-width">
+
+                            <label>
+                                Password
+                                <span>*</span>
+                            </label>
+
+                            <input type="password"
+                                   @bind="serviceNowForm.Password"
+                                   placeholder="Enter password" />
+
+                        </div>
+                    }
+
+
+                    <!-- OAUTH 2.0 -->
+                    @if (serviceNowForm.AuthenticationType == "OAuth2")
+                    {
+                        <div class="form-field">
+
+                            <label>
+                                Client ID
+                                <span>*</span>
+                            </label>
+
+                            <input type="text"
+                                   @bind="serviceNowForm.ClientId"
+                                   placeholder="OAuth Client ID" />
+
+                        </div>
+
+
+                        <div class="form-field full-width">
+
+                            <label>
+                                Client Secret
+                                <span>*</span>
+                            </label>
+
+                            <input type="password"
+                                   @bind="serviceNowForm.ClientSecret"
+                                   placeholder="OAuth Client Secret" />
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <div class="editor-actions">
+
+                    <button type="button"
+                            class="secondary-button">
+
+                        Test Connection
+
+                    </button>
+
+
+                    <div class="editor-actions-right">
+
+                        <button type="button"
+                                class="cancel-button"
+                                @onclick="CloseEditor">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button type="button"
+                                class="primary-button">
+
+                            Save Connection
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+        }
+    }
+
+
+    <!-- =====================================================
+         CONTENT MANAGER CONNECTIONS
+    ====================================================== -->
+    @if (activeTab == "contentmanager")
+    {
+        <section class="connection-panel">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <h2>
+                        Content Manager Connections
+                    </h2>
+
+                    <p>
+                        Manage OpenText Content Manager Workgroup Server and dataset connections.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="connection-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Name</th>
+                            <th>Workgroup Server</th>
+                            <th>Port</th>
+                            <th>Dataset</th>
+                            <th>Authentication</th>
+                            <th>Status</th>
+                            <th class="actions-column">Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var connection in contentManagerConnections)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    <div class="connection-name">
+
+                                        <strong>
+                                            @connection.Name
+                                        </strong>
+
+                                        <span>
+                                            @connection.Description
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+                                    @connection.WorkgroupServer
+                                </td>
+
+
+                                <td>
+                                    @connection.Port
+                                </td>
+
+
+                                <td>
+                                    @connection.DatasetId
+                                </td>
+
+
+                                <td>
+
+                                    <span class="auth-badge">
+                                        @connection.AuthenticationType
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    @if (connection.IsOnline)
+                                    {
+                                        <span class="status-badge online">
+                                            ● Online
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge offline">
+                                            ● Offline
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="action-group">
+
+                                        <button type="button"
+                                                class="action-button test-button">
+
+                                            Test
+
+                                        </button>
+
+
+                                        <button type="button"
+                                                class="action-button">
+
+                                            Edit
+
+                                        </button>
+
+
+                                        <button type="button"
+                                                class="action-button danger">
+
+                                            Delete
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ADD CONTENT MANAGER CONNECTION
+        ================================================== -->
+        @if (showEditor)
+        {
+            <section class="connection-editor">
+
+                <div class="editor-heading">
+
+                    <div>
+
+                        <h2>
+                            Add Content Manager Connection
+                        </h2>
+
+                        <p>
+                            Configure the Content Manager Workgroup Server and dataset.
+                        </p>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="close-button"
+                            @onclick="CloseEditor">
+
+                        ×
+
+                    </button>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <!-- CONNECTION NAME -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Connection Name
+                            <span>*</span>
+                        </label>
+
+                        <input type="text"
+                               @bind="contentManagerForm.Name"
+                               placeholder="e.g. Global CM" />
+
+                    </div>
+
+
+                    <!-- WORKGROUP SERVER -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Workgroup Server
+                            <span>*</span>
+                        </label>
+
+                        <input type="text"
+                               @bind="contentManagerForm.WorkgroupServer"
+                               placeholder="cmwgs01" />
+
+                    </div>
+
+
+                    <!-- PORT -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Port
+                            <span>*</span>
+                        </label>
+
+                        <input type="number"
+                               @bind="contentManagerForm.Port"
+                               placeholder="1137" />
+
+                    </div>
+
+
+                    <!-- DATASET -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Dataset ID
+                            <span>*</span>
+                        </label>
+
+                        <input type="text"
+                               @bind="contentManagerForm.DatasetId"
+                               placeholder="45" />
+
+                    </div>
+
+
+                    <!-- AUTHENTICATION TYPE -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Authentication Type
+                            <span>*</span>
+                        </label>
+
+                        <select @bind="contentManagerForm.AuthenticationType">
+
+                            <option value="IntegratedWindows">
+                                Integrated Windows
+                            </option>
+
+                            <option value="ExplicitCredentials">
+                                Explicit Credentials
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- INTEGRATED WINDOWS INFORMATION -->
+                    @if (contentManagerForm.AuthenticationType == "IntegratedWindows")
+                    {
+                        <div class="authentication-info full-width">
+
+                            <div class="authentication-info-icon">
+                                i
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Integrated Windows Authentication
+                                </strong>
+
+                                <p>
+                                    Content Manager operations will use the Windows account
+                                    running the ServiceNowCM runtime service.
+                                </p>
+
+                                <span>
+                                    Recommended for production deployments. No Content Manager
+                                    password is stored by the connector.
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    <!-- EXPLICIT CREDENTIALS -->
+                    @if (contentManagerForm.AuthenticationType == "ExplicitCredentials")
+                    {
+                        <div class="form-field">
+
+                            <label>
+                                Username
+                                <span>*</span>
+                            </label>
+
+                            <input type="text"
+                                   @bind="contentManagerForm.Username"
+                                   placeholder="DOMAIN\serviceaccount" />
+
+                        </div>
+
+
+                        <div class="form-field">
+
+                            <label>
+                                Password
+                                <span>*</span>
+                            </label>
+
+                            <input type="password"
+                                   @bind="contentManagerForm.Password"
+                                   placeholder="Enter password" />
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <div class="editor-actions">
+
+                    <button type="button"
+                            class="secondary-button">
+
+                        Test Connection
+
+                    </button>
+
+
+                    <div class="editor-actions-right">
+
+                        <button type="button"
+                                class="cancel-button"
+                                @onclick="CloseEditor">
+
+                            Cancel
+
+                        </button>
+
+
+                        <button type="button"
+                                class="primary-button">
+
+                            Save Connection
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+        }
+    }
+
+
+    <!-- =====================================================
+         PROTOTYPE NOTICE
+    ====================================================== -->
+
+    <div class="prototype-notice">
+
+        Connection information shown on this page is currently sample UI data.
+        Backend integration will be connected in the next implementation phase.
+
+    </div>
+
+</div>
+
+
+@code {
+
+    // =====================================================
+    // PAGE STATE
+    // =====================================================
+
+    private string activeTab = "servicenow";
+
+    private bool showEditor;
+
+
+    // =====================================================
+    // FORM MODELS
+    // =====================================================
+
+    private ServiceNowConnectionFormModel serviceNowForm = new();
+
+    private ContentManagerConnectionFormModel contentManagerForm = new();
+
+
+    // =====================================================
+    // SAMPLE SERVICENOW CONNECTIONS
+    // =====================================================
+
+    private readonly List<ServiceNowConnectionViewModel> serviceNowConnections =
+        new()
+        {
+            new()
+            {
+                Name = "Corporate ServiceNow",
+                Description = "Primary production instance",
+                InstanceUrl = "https://company.service-now.com",
+                AuthenticationType = "Basic",
+                IsOnline = true,
+                LastTested = "Today 10:32"
+            },
+
+            new()
+            {
+                Name = "UAT ServiceNow",
+                Description = "User acceptance environment",
+                InstanceUrl = "https://companyuat.service-now.com",
+                AuthenticationType = "OAuth 2.0",
+                IsOnline = true,
+                LastTested = "Today 09:18"
+            }
+        };
+
+
+    // =====================================================
+    // SAMPLE CONTENT MANAGER CONNECTIONS
+    // =====================================================
+
+    private readonly List<ContentManagerConnectionViewModel> contentManagerConnections =
+        new()
+        {
+            new()
+            {
+                Name = "Global CM",
+                Description = "Production Content Manager dataset",
+                WorkgroupServer = "cmwgs01",
+                Port = 1137,
+                DatasetId = "45",
+                AuthenticationType = "Integrated Windows",
+                IsOnline = true
+            },
+
+            new()
+            {
+                Name = "UAT CM",
+                Description = "UAT Content Manager dataset",
+                WorkgroupServer = "cmwgs-uat",
+                Port = 1137,
+                DatasetId = "45",
+                AuthenticationType = "Integrated Windows",
+                IsOnline = true
+            }
+        };
+
+
+    // =====================================================
+    // CONNECTION HEALTH
+    // =====================================================
+
+    private bool AllConnectionsHealthy =>
+        serviceNowConnections.All(connection => connection.IsOnline)
+        &&
+        contentManagerConnections.All(connection => connection.IsOnline);
+
+
+    // =====================================================
+    // TAB NAVIGATION
+    // =====================================================
+
+    private void ShowServiceNow()
+    {
+        activeTab = "servicenow";
+
+        showEditor = false;
+    }
+
+
+    private void ShowContentManager()
+    {
+        activeTab = "contentmanager";
+
+        showEditor = false;
+    }
+
+
+    // =====================================================
+    // EDITOR
+    // =====================================================
+
+    private void ToggleEditor()
+    {
+        if (!showEditor)
+        {
+            if (activeTab == "servicenow")
+            {
+                serviceNowForm =
+                    new ServiceNowConnectionFormModel();
+            }
+            else if (activeTab == "contentmanager")
+            {
+                contentManagerForm =
+                    new ContentManagerConnectionFormModel();
+            }
+        }
+
+        showEditor = !showEditor;
+    }
+
+
+    private void CloseEditor()
+    {
+        showEditor = false;
+    }
+
+
+    // =====================================================
+    // SERVICENOW VIEW MODEL
+    // =====================================================
+
+    private sealed class ServiceNowConnectionViewModel
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+
+        public string InstanceUrl { get; set; } = string.Empty;
+
+        public string AuthenticationType { get; set; } = string.Empty;
+
+        public bool IsOnline { get; set; }
+
+        public string LastTested { get; set; } = string.Empty;
+    }
+
+
+    // =====================================================
+    // CONTENT MANAGER VIEW MODEL
+    // =====================================================
+
+    private sealed class ContentManagerConnectionViewModel
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+
+        public string WorkgroupServer { get; set; } = string.Empty;
+
+        public int Port { get; set; }
+
+        public string DatasetId { get; set; } = string.Empty;
+
+        public string AuthenticationType { get; set; } = string.Empty;
+
+        public bool IsOnline { get; set; }
+    }
+
+
+    // =====================================================
+    // SERVICENOW FORM MODEL
+    // =====================================================
+
+    private sealed class ServiceNowConnectionFormModel
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string InstanceUrl { get; set; } = string.Empty;
+
+        public string AuthenticationType { get; set; } = "Basic";
+
+        public string Username { get; set; } = string.Empty;
+
+        public string Password { get; set; } = string.Empty;
+
+        public string ClientId { get; set; } = string.Empty;
+
+        public string ClientSecret { get; set; } = string.Empty;
+    }
+
+
+    // =====================================================
+    // CONTENT MANAGER FORM MODEL
+    // =====================================================
+
+    private sealed class ContentManagerConnectionFormModel
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string WorkgroupServer { get; set; } = string.Empty;
+
+        public int Port { get; set; } = 1137;
+
+        public string DatasetId { get; set; } = string.Empty;
+
+        public string AuthenticationType { get; set; }
+            = "IntegratedWindows";
+
+        public string Username { get; set; } = string.Empty;
+
+        public string Password { get; set; } = string.Empty;
+    }
+}
