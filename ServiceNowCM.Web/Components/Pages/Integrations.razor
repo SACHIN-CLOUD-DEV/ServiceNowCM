@@ -2,8 +2,1037 @@
 
 <PageTitle>Integrations</PageTitle>
 
-<h1>Integrations</h1>
+<div class="integrations-page">
 
-<p>
-    Configure ServiceNow to Content Manager integrations.
-</p>
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="page-heading">
+
+        <div>
+            <h1>Integration Configuration</h1>
+
+            <p>
+                Configure how ServiceNow records are transferred and archived
+                into OpenText Content Manager.
+            </p>
+        </div>
+
+        <div class="draft-badge">
+            Draft
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         WIZARD STEPS
+    ====================================================== -->
+
+    <div class="wizard-progress">
+
+        @foreach (var step in wizardSteps)
+        {
+            <div class="wizard-step-container">
+
+                <div class="wizard-step
+                                @(step.Number == currentStep ? "active" : "")
+                                @(step.Number < currentStep ? "completed" : "")">
+
+                    <div class="step-number">
+
+                        @if (step.Number < currentStep)
+                        {
+                            <span>✓</span>
+                        }
+                        else
+                        {
+                            <span>@step.Number</span>
+                        }
+
+                    </div>
+
+                    <div class="step-text">
+
+                        <strong>
+                            @step.Title
+                        </strong>
+
+                        <span>
+                            @step.Description
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                @if (step.Number < wizardSteps.Count)
+                {
+                    <div class="step-connector
+                                        @(step.Number < currentStep ? "completed" : "")">
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- =====================================================
+         WIZARD CONTENT
+    ====================================================== -->
+
+    <section class="wizard-card">
+
+        <!-- =================================================
+             STEP 1 - SOURCE
+        ================================================== -->
+        @if (currentStep == 1)
+        {
+            <div class="wizard-section">
+
+                <div class="section-heading">
+
+                    <div class="section-number">
+                        1
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Source Configuration
+                        </h2>
+
+                        <p>
+                            Select the ServiceNow connection, table and records
+                            that this integration should process.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="source-info">
+
+                    <div class="source-info-icon">
+                        SN
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            ServiceNow Source
+                        </strong>
+
+                        <p>
+                            Source metadata such as tables and fields will
+                            eventually be discovered dynamically from the
+                            selected ServiceNow connection.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <!-- INTEGRATION NAME -->
+
+                    <div class="form-field full-width">
+
+                        <label>
+                            Integration Name
+                            <span>*</span>
+                        </label>
+
+                        <input type="text"
+                               @bind="integrationForm.Name"
+                               placeholder="e.g. HR Case Archive" />
+
+                        <small>
+                            Use a meaningful name that identifies the business
+                            process being synchronized.
+                        </small>
+
+                    </div>
+
+
+                    <!-- SERVICENOW CONNECTION -->
+
+                    <div class="form-field">
+
+                        <label>
+                            ServiceNow Connection
+                            <span>*</span>
+                        </label>
+
+                        <select @bind="integrationForm.ServiceNowConnectionId">
+
+                            <option value="">
+                                -- Select ServiceNow Connection --
+                            </option>
+
+                            @foreach (var connection in serviceNowConnections)
+                            {
+                                <option value="@connection.Id">
+                                    @connection.Name
+                                </option>
+                            }
+
+                        </select>
+
+                        <small>
+                            Select the configured ServiceNow environment.
+                        </small>
+
+                    </div>
+
+
+                    <!-- SERVICENOW TABLE -->
+
+                    <div class="form-field">
+
+                        <label>
+                            ServiceNow Table
+                            <span>*</span>
+                        </label>
+
+                        <select @bind="integrationForm.TableName">
+
+                            <option value="">
+                                -- Select Table --
+                            </option>
+
+                            @foreach (var table in serviceNowTables)
+                            {
+                                <option value="@table.Name">
+                                    @table.Label (@table.Name)
+                                </option>
+                            }
+
+                        </select>
+
+                        <small>
+                            Tables will later be loaded dynamically from ServiceNow.
+                        </small>
+
+                    </div>
+
+
+                    <!-- ENCODED QUERY -->
+
+                    <div class="form-field full-width">
+
+                        <label>
+                            Encoded Query
+                        </label>
+
+                        <textarea rows="3"
+                                  @bind="integrationForm.EncodedQuery"
+                                  placeholder="e.g. active=true^state=3">
+                            </textarea>
+
+                        <small>
+                            Optional ServiceNow encoded query used to restrict
+                            the records processed by this integration.
+                        </small>
+
+                    </div>
+
+
+                    <!-- PAGE SIZE -->
+
+                    <div class="form-field">
+
+                        <label>
+                            ServiceNow Page Size
+                            <span>*</span>
+                        </label>
+
+                        <input type="number"
+                               min="1"
+                               max="1000"
+                               @bind="integrationForm.PageSize" />
+
+                        <small>
+                            Number of records retrieved from ServiceNow per API request.
+                        </small>
+
+                    </div>
+
+
+                    <!-- PROCESSING BATCH SIZE -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Processing Batch Size
+                            <span>*</span>
+                        </label>
+
+                        <input type="number"
+                               min="1"
+                               @bind="integrationForm.ProcessingBatchSize" />
+
+                        <small>
+                            Number of records processed by the connector in each batch.
+                        </small>
+
+                    </div>
+
+
+                    <!-- OPTIONS -->
+
+                    <div class="form-field full-width">
+
+                        <label>
+                            ServiceNow API Options
+                        </label>
+
+                        <div class="option-list">
+
+                            <label class="checkbox-option">
+
+                                <input type="checkbox"
+                                       @bind="integrationForm.DisplayValues" />
+
+                                <div>
+
+                                    <strong>
+                                        Return display values
+                                    </strong>
+
+                                    <span>
+                                        Retrieve readable ServiceNow display values
+                                        instead of only internal identifiers.
+                                    </span>
+
+                                </div>
+
+                            </label>
+
+
+                            <label class="checkbox-option">
+
+                                <input type="checkbox"
+                                       @bind="integrationForm.ExcludeReferenceLinks" />
+
+                                <div>
+
+                                    <strong>
+                                        Exclude reference links
+                                    </strong>
+
+                                    <span>
+                                        Prevent ServiceNow REST responses from returning
+                                        unnecessary reference URLs.
+                                    </span>
+
+                                </div>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SOURCE PREVIEW -->
+
+                <div class="preview-section">
+
+                    <div>
+
+                        <strong>
+                            Source Preview
+                        </strong>
+
+                        <p>
+                            Test the selected ServiceNow configuration and preview
+                            a small number of matching records before continuing.
+                        </p>
+
+                    </div>
+
+                    <button type="button"
+                            class="secondary-button">
+
+                        Preview Source Records
+
+                    </button>
+
+                </div>
+
+            </div>
+        }
+
+
+        <!-- =================================================
+             STEP 2 - TARGET
+        ================================================== -->
+        @if (currentStep == 2)
+        {
+            <div class="wizard-section">
+
+                <div class="section-heading">
+
+                    <div class="section-number">
+                        2
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Target & Record Type
+                        </h2>
+
+                        <p>
+                            Select the OpenText Content Manager environment and
+                            Record Type where ServiceNow records will be archived.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="target-info">
+
+                    <div class="target-info-icon">
+                        CM
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            OpenText Content Manager Target
+                        </strong>
+
+                        <p>
+                            Record Types and their available metadata fields will
+                            eventually be discovered dynamically from the selected
+                            Content Manager connection.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <!-- CONTENT MANAGER CONNECTION -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Content Manager Connection
+                            <span>*</span>
+                        </label>
+
+                        <select @bind="integrationForm.ContentManagerConnectionId">
+
+                            <option value="">
+                                -- Select Content Manager Connection --
+                            </option>
+
+                            @foreach (var connection in contentManagerConnections)
+                            {
+                                <option value="@connection.Id">
+                                    @connection.Name
+                                </option>
+                            }
+
+                        </select>
+
+                        <small>
+                            Select the Content Manager dataset used as the
+                            archival destination.
+                        </small>
+
+                    </div>
+
+
+                    <!-- RECORD TYPE -->
+
+                    <div class="form-field">
+
+                        <label>
+                            Content Manager Record Type
+                            <span>*</span>
+                        </label>
+
+                        <select @bind="integrationForm.RecordTypeUri"
+                                disabled="@string.IsNullOrWhiteSpace(
+                                                            integrationForm.ContentManagerConnectionId)">
+
+                        <option value="">
+                            -- Select Record Type --
+                        </option>
+
+                        @foreach (var recordType in contentManagerRecordTypes)
+                            {
+                                <option value="@recordType.Uri">
+                                    @recordType.Name
+                                </option>
+                            }
+
+                        </select>
+
+                        <small>
+                            The Record Type determines which Content Manager
+                            properties and Additional Fields can be mapped.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                @if (!string.IsNullOrWhiteSpace(
+                            integrationForm.ContentManagerConnectionId))
+                {
+                    <div class="selected-target-card">
+
+                        <div>
+
+                            <strong>
+                                Selected CM Environment
+                            </strong>
+
+                            <p>
+                                @GetSelectedContentManagerDescription()
+                            </p>
+
+                        </div>
+
+                        <span class="target-status">
+                            ● Available
+                        </span>
+
+                    </div>
+                }
+
+
+                @if (!string.IsNullOrWhiteSpace(
+                            integrationForm.RecordTypeUri))
+                {
+                    <div class="record-type-summary">
+
+                        <div class="record-type-header">
+
+                            <div>
+
+                                <strong>
+                                    Record Type Ready
+                                </strong>
+
+                                <p>
+                                    @GetSelectedRecordTypeName()
+                                </p>
+
+                            </div>
+
+                            <span class="ready-badge">
+                                Ready for Mapping
+                            </span>
+
+                        </div>
+
+
+                        <div class="record-type-details">
+
+                            <div>
+
+                                <span>
+                                    Record Type URI
+                                </span>
+
+                                <strong>
+                                    @integrationForm.RecordTypeUri
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Metadata Discovery
+                                </span>
+
+                                <strong>
+                                    Available
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Next Step
+                                </span>
+
+                                <strong>
+                                    Metadata Mapping
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+
+                <div class="target-note">
+
+                    <strong>
+                        Why must the Record Type be selected first?
+                    </strong>
+
+                    <p>
+                        Content Manager Additional Fields can be associated with
+                        specific Record Types. Selecting the Record Type allows
+                        the connector to discover the correct target metadata
+                        before field mapping is configured.
+                    </p>
+
+                </div>
+
+            </div>
+        }
+
+
+        <!-- =================================================
+             STEP 3 - MAPPING
+        ================================================== -->
+        @if (currentStep == 3)
+        {
+            <div class="placeholder-step">
+
+                <span class="placeholder-number">
+                    3
+                </span>
+
+                <h2>
+                    Metadata Mapping
+                </h2>
+
+                <p>
+                    Map ServiceNow fields to Content Manager properties
+                    and Additional Fields.
+                </p>
+
+            </div>
+        }
+
+
+        <!-- =================================================
+             STEP 4 - PDF
+        ================================================== -->
+        @if (currentStep == 4)
+        {
+            <div class="placeholder-step">
+
+                <span class="placeholder-number">
+                    4
+                </span>
+
+                <h2>
+                    PDF Snapshot
+                </h2>
+
+                <p>
+                    Configure the human-readable ServiceNow record snapshot
+                    that will be stored in Content Manager.
+                </p>
+
+            </div>
+        }
+
+
+        <!-- =================================================
+             STEP 5 - ATTACHMENTS
+        ================================================== -->
+        @if (currentStep == 5)
+        {
+            <div class="placeholder-step">
+
+                <span class="placeholder-number">
+                    5
+                </span>
+
+                <h2>
+                    Attachments
+                </h2>
+
+                <p>
+                    Configure how ServiceNow attachments are transferred
+                    to Content Manager.
+                </p>
+
+            </div>
+        }
+
+
+        <!-- =================================================
+             STEP 6 - VALIDATE
+        ================================================== -->
+        @if (currentStep == 6)
+        {
+            <div class="placeholder-step">
+
+                <span class="placeholder-number">
+                    6
+                </span>
+
+                <h2>
+                    Validate & Preview
+                </h2>
+
+                <p>
+                    Validate the complete integration configuration and perform
+                    a dry-run preview before activation.
+                </p>
+
+            </div>
+        }
+
+
+        <!-- =================================================
+             STEP 7 - ACTIVATE
+        ================================================== -->
+        @if (currentStep == 7)
+        {
+            <div class="placeholder-step">
+
+                <span class="placeholder-number">
+                    7
+                </span>
+
+                <h2>
+                    Schedule & Activate
+                </h2>
+
+                <p>
+                    Configure execution scheduling and activate the integration.
+                </p>
+
+            </div>
+        }
+
+
+        <!-- =================================================
+             WIZARD FOOTER
+        ================================================== -->
+
+        <div class="wizard-footer">
+
+            <button type="button"
+                    class="cancel-button">
+
+                Cancel
+
+            </button>
+
+
+            <div class="wizard-footer-right">
+
+                <button type="button"
+                        class="secondary-button"
+                        disabled="@(currentStep == 1)"
+                        @onclick="PreviousStep">
+
+                    ← Previous
+
+                </button>
+
+
+                @if (currentStep < wizardSteps.Count)
+                {
+                    <button type="button"
+                            class="primary-button"
+                            @onclick="NextStep">
+
+                        Next →
+
+                    </button>
+                }
+                else
+                {
+                    <button type="button"
+                            class="primary-button">
+
+                        Save & Activate
+
+                    </button>
+                }
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="prototype-notice">
+
+        Integration configuration currently uses sample connection and table
+        data. Dynamic metadata discovery will be connected to the existing
+        backend services in a later implementation step.
+
+    </div>
+
+</div>
+
+
+@code {
+
+    // =====================================================
+    // WIZARD STATE
+    // =====================================================
+
+    private int currentStep = 1;
+
+
+    private readonly List<WizardStep> wizardSteps =
+        new()
+        {
+            new(1, "Source", "ServiceNow"),
+            new(2, "Target", "CM Record Type"),
+            new(3, "Mapping", "Metadata"),
+            new(4, "PDF", "Snapshot"),
+            new(5, "Attachments", "Files"),
+            new(6, "Validate", "Preview"),
+            new(7, "Activate", "Schedule")
+        };
+
+
+    // =====================================================
+    // FORM STATE
+    // =====================================================
+
+    private IntegrationFormModel integrationForm =
+        new();
+
+
+    // =====================================================
+    // SAMPLE SERVICENOW CONNECTIONS
+    // =====================================================
+
+    private readonly List<ServiceNowConnectionOption> serviceNowConnections =
+        new()
+        {
+            new()
+            {
+                Id = "1",
+                Name = "Corporate ServiceNow"
+            },
+
+            new()
+            {
+                Id = "2",
+                Name = "UAT ServiceNow"
+            }
+        };
+
+
+    // =====================================================
+    // SAMPLE SERVICENOW TABLES
+    // =====================================================
+
+    private readonly List<ServiceNowTableOption> serviceNowTables =
+        new()
+        {
+            new()
+            {
+                Name = "incident",
+                Label = "Incident"
+            },
+
+            new()
+            {
+                Name = "sn_hr_core_case",
+                Label = "HR Case"
+            },
+
+            new()
+            {
+                Name = "sc_task",
+                Label = "Catalog Task"
+            }
+        };
+
+    private readonly List<ContentManagerConnectionOption> contentManagerConnections =
+    new()
+    {
+            new()
+            {
+                Id = "1",
+                Name = "Global CM",
+                WorkgroupServer = "cmwgs01",
+                DatasetId = "45"
+            },
+
+            new()
+            {
+                Id = "2",
+                Name = "UAT CM",
+                WorkgroupServer = "cmwgs-uat",
+                DatasetId = "45"
+            }
+    };
+
+    private readonly List<ContentManagerRecordTypeOption>
+    contentManagerRecordTypes =
+        new()
+        {
+            new()
+            {
+                Uri = "2",
+                Name = "Document"
+            },
+
+            new()
+            {
+                Uri = "5",
+                Name = "Electronic Document"
+            },
+
+            new()
+            {
+                Uri = "8",
+                Name = "ServiceNow Record"
+            }
+        };
+
+    private string GetSelectedContentManagerDescription()
+    {
+        var connection =
+            contentManagerConnections.FirstOrDefault(
+                x => x.Id ==
+                     integrationForm.ContentManagerConnectionId);
+
+        if (connection is null)
+        {
+            return string.Empty;
+        }
+
+        return $"{connection.Name} • " +
+               $"{connection.WorkgroupServer} • " +
+               $"Dataset {connection.DatasetId}";
+    }
+
+
+    private string GetSelectedRecordTypeName()
+    {
+        var recordType =
+            contentManagerRecordTypes.FirstOrDefault(
+                x => x.Uri == integrationForm.RecordTypeUri);
+
+        return recordType?.Name ?? string.Empty;
+    }
+
+
+    // =====================================================
+    // WIZARD NAVIGATION
+    // =====================================================
+
+    private void NextStep()
+    {
+        if (currentStep < wizardSteps.Count)
+        {
+            currentStep++;
+        }
+    }
+
+
+    private void PreviousStep()
+    {
+        if (currentStep > 1)
+        {
+            currentStep--;
+        }
+    }
+
+
+    // =====================================================
+    // MODELS
+    // =====================================================
+
+    private sealed record WizardStep(
+        int Number,
+        string Title,
+        string Description);
+
+
+    private sealed class IntegrationFormModel
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string ServiceNowConnectionId { get; set; }
+            = string.Empty;
+
+        public string TableName { get; set; }
+            = string.Empty;
+
+        public string EncodedQuery { get; set; }
+            = string.Empty;
+
+        public int PageSize { get; set; } = 750;
+
+        public int ProcessingBatchSize { get; set; } = 100;
+
+        public bool DisplayValues { get; set; } = true;
+
+        public bool ExcludeReferenceLinks { get; set; } = true;
+
+        public string ContentManagerConnectionId { get; set; } = string.Empty;
+
+        public string RecordTypeUri { get; set; } = string.Empty;
+    }
+
+
+    private sealed class ServiceNowConnectionOption
+    {
+        public string Id { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
+    }
+
+
+    private sealed class ServiceNowTableOption
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Label { get; set; } = string.Empty;
+    }
+
+    private sealed class ContentManagerConnectionOption
+    {
+        public string Id { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
+
+        public string WorkgroupServer { get; set; } = string.Empty;
+
+        public string DatasetId { get; set; } = string.Empty;
+    }
+
+
+    private sealed class ContentManagerRecordTypeOption
+    {
+        public string Uri { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
+    }
+}
