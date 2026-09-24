@@ -36,18 +36,45 @@ public class SyncJobRepository : ISyncJobRepository
                 cancellationToken);
     }
 
-    public async Task<SyncJob?> GetLatestIncompleteAsync(
-    long integrationId,
-    CancellationToken cancellationToken = default)
+    public async Task<SyncJob?> GetLatestResumableAsync(
+        long integrationId,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbContext.SyncJobs
-            .Where(x =>
-                x.IntegrationId == integrationId &&
-                (x.Status == "Failed" ||
-                 x.Status == "Running" ||
-                 x.Status == "Interrupted"))
-            .OrderByDescending(x => x.StartedAtUtc)
-            .FirstOrDefaultAsync(cancellationToken);
+        // Always inspect the latest execution first.
+        // An older Failed job must not be resumed after a newer
+        // execution has already completed or is currently running.
+        var latestJob =
+            await _dbContext.SyncJobs
+                .Where(x =>
+                    x.IntegrationId == integrationId)
+                .OrderByDescending(x =>
+                    x.StartedAtUtc)
+                .ThenByDescending(x =>
+                    x.Id)
+                .FirstOrDefaultAsync(
+                    cancellationToken);
+
+        if (latestJob == null)
+        {
+            return null;
+        }
+
+        // Current safe policy:
+        // only the latest Failed job can be resumed.
+        //
+        // Running is excluded because we do not yet have heartbeat/lease
+        // logic to determine whether it is active or abandoned.
+        //
+        // Interrupted is historical and must not be selected repeatedly.
+        if (!string.Equals(
+                latestJob.Status,
+                "Failed",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return latestJob;
     }
 
     public async Task UpdateAsync(

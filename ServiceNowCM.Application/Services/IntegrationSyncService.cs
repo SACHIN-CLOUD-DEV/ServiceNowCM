@@ -142,15 +142,16 @@ namespace ServiceNowCM.Application.Services
             {
                 var previousJob =
                     await _syncJobRepository
-                        .GetLatestIncompleteAsync(
+                        .GetLatestResumableAsync(
                             integration.Id,
                             cancellationToken);
 
                 if (previousJob == null)
                 {
                     throw new InvalidOperationException(
-                        $"No incomplete synchronization job was found " +
-                        $"for integration '{integration.Name}'.");
+                        $"No resumable failed synchronization job was found " +
+                        $"for integration '{integration.Name}'. " +
+                        $"Only the latest job can be resumed, and it must be in Failed status.");
                 }
 
                 startingOffset =
@@ -166,12 +167,8 @@ namespace ServiceNowCM.Application.Services
                         "The previous synchronization job contains an invalid checkpoint.");
                 }
 
-                previousJob.MarkInterrupted();
-
-                await _syncJobRepository.UpdateAsync(
-                    previousJob,
-                    cancellationToken);
-
+                // Keep the previous failed job unchanged for audit/history.
+                // The resumed execution receives its own new SyncJob.
                 syncJob =
                     new SyncJob(
                         integration.Id);

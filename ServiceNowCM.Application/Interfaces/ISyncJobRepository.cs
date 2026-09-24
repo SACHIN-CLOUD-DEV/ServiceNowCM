@@ -12,7 +12,7 @@ public interface ISyncJobRepository
         long id,
         CancellationToken cancellationToken = default);
 
-    Task<SyncJob?> GetLatestIncompleteAsync(
+    Task<SyncJob?> GetLatestResumableAsync(
         long integrationId,
         CancellationToken cancellationToken = default);
 
