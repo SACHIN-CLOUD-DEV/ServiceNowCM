@@ -114,6 +114,19 @@
             ModifiedAtUtc = DateTime.UtcNow;
         }
 
+        public void SetServiceNowConnection(long serviceNowConnectionId)
+        {
+            if (serviceNowConnectionId <= 0)
+            {
+                throw new ArgumentException(
+                    "ServiceNow connection ID must be greater than zero.",
+                    nameof(serviceNowConnectionId));
+            }
+
+            ServiceNowConnectionId = serviceNowConnectionId;
+            ModifiedAtUtc = DateTime.UtcNow;
+        }
+
         public void Update(
             string name,
             string tableName,

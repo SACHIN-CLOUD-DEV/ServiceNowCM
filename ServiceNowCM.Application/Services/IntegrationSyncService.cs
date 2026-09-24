@@ -592,71 +592,243 @@ namespace ServiceNowCM.Application.Services
                             var cmStopwatch =
                                 Stopwatch.StartNew();
 
-                            var createResults =
-                                await cmSession
-                                    .ProcessRecordsAsync(
-                                        newRecords,
-                                        cancellationToken);
+                            var cmResultsReturned = false;
 
-                            cmStopwatch.Stop();
-
-                            totalCmProcessingMilliseconds +=
-                                cmStopwatch.ElapsedMilliseconds;
-
-                            // =========================================
-                            // 18. Process CM results
-                            // =========================================
-                            foreach (var createResult in createResults)
+                            try
                             {
-                                cancellationToken
-                                    .ThrowIfCancellationRequested();
+                                var createResults =
+                                    await cmSession
+                                        .ProcessRecordsAsync(
+                                            newRecords,
+                                            cancellationToken);
 
-                                result.TotalProcessed++;
+                                cmResultsReturned = true;
 
-                                // -------------------------------------
-                                // Find original ServiceNow record
-                                // -------------------------------------
-                                var sourceRecord =
-                                    newRecords
-                                        .FirstOrDefault(
-                                            x =>
-                                            {
-                                                if (!x.TryGetValue(
-                                                        "sys_id",
-                                                        out var sourceIdElement))
-                                                {
-                                                    return false;
-                                                }
+                                cmStopwatch.Stop();
 
-                                                var currentSourceSysId =
-                                                    GetJsonValueAsString(
-                                                        sourceIdElement);
+                                totalCmProcessingMilliseconds +=
+                                    cmStopwatch.ElapsedMilliseconds;
 
-                                                return string.Equals(
-                                                    currentSourceSysId,
-                                                    createResult.SourceSysId,
-                                                    StringComparison
-                                                        .OrdinalIgnoreCase);
-                                            });
-
-                                string?
-                                    sourceRecordNumber = null;
-
-                                if (sourceRecord != null &&
-                                    sourceRecord.TryGetValue(
-                                        "number",
-                                        out var numberElement))
+                                // =========================================
+                                // 18. Process CM results
+                                // =========================================
+                                foreach (var createResult in createResults)
                                 {
-                                    sourceRecordNumber =
-                                        GetJsonValueAsString(
-                                            numberElement);
+                                    cancellationToken
+                                        .ThrowIfCancellationRequested();
+
+                                    result.TotalProcessed++;
+
+                                    // -------------------------------------
+                                    // Find original ServiceNow record
+                                    // -------------------------------------
+                                    var sourceRecord =
+                                        newRecords
+                                            .FirstOrDefault(
+                                                x =>
+                                                {
+                                                    if (!x.TryGetValue(
+                                                            "sys_id",
+                                                            out var sourceIdElement))
+                                                    {
+                                                        return false;
+                                                    }
+
+                                                    var currentSourceSysId =
+                                                        GetJsonValueAsString(
+                                                            sourceIdElement);
+
+                                                    return string.Equals(
+                                                        currentSourceSysId,
+                                                        createResult.SourceSysId,
+                                                        StringComparison
+                                                            .OrdinalIgnoreCase);
+                                                });
+
+                                    string?
+                                        sourceRecordNumber = null;
+
+                                    if (sourceRecord != null &&
+                                        sourceRecord.TryGetValue(
+                                            "number",
+                                            out var numberElement))
+                                    {
+                                        sourceRecordNumber =
+                                            GetJsonValueAsString(
+                                                numberElement);
+                                    }
+
+                                    // -------------------------------------
+                                    // CONTENT MANAGER CREATION FAILURE
+                                    // -------------------------------------
+                                    if (!createResult.Success)
+                                    {
+                                        result.TotalFailed++;
+
+                                        await RecordFailureAsync(
+                                            syncJobId:
+                                                syncJob.Id,
+
+                                            integrationId:
+                                                integration.Id,
+
+                                            sourceSysId:
+                                                createResult.SourceSysId,
+
+                                            sourceRecordNumber:
+                                                sourceRecordNumber,
+
+                                            errorCategory:
+                                                "ContentManager",
+
+                                            errorMessage:
+                                                string.IsNullOrWhiteSpace(
+                                                    createResult.Message)
+                                                    ? "Content Manager record creation failed."
+                                                    : createResult.Message,
+
+                                            attemptNumber:
+                                                1,
+
+                                            contentManagerRecordUri:
+                                                createResult.RecordUri,
+
+                                            cancellationToken:
+                                                cancellationToken);
+
+                                        _logger.LogWarning(
+                                            "CM record creation failed. " +
+                                            "SyncJobId: {SyncJobId}, " +
+                                            "IntegrationId: {IntegrationId}, " +
+                                            "SourceSysId: {SourceSysId}, " +
+                                            "SourceRecordNumber: {SourceRecordNumber}, " +
+                                            "Error: {Error}",
+                                            syncJob.Id,
+                                            integration.Id,
+                                            createResult.SourceSysId,
+                                            sourceRecordNumber,
+                                            createResult.Message);
+
+                                        continue;
+                                    }
+
+                                    // -------------------------------------
+                                    // CM succeeded but SourceSysId missing
+                                    // -------------------------------------
+                                    if (string.IsNullOrWhiteSpace(
+                                            createResult.SourceSysId))
+                                    {
+                                        result.TotalFailed++;
+
+                                        _logger.LogWarning(
+                                            "CM record was created but SourceSysId " +
+                                            "was not returned. SyncJobId: {SyncJobId}",
+                                            syncJob.Id);
+
+                                        continue;
+                                    }
+
+                                    // -------------------------------------
+                                    // CM succeeded but RecordUri missing
+                                    // -------------------------------------
+                                    if (!createResult.RecordUri.HasValue)
+                                    {
+                                        result.TotalFailed++;
+
+                                        _logger.LogWarning(
+                                            "CM result does not contain RecordUri. " +
+                                            "SyncJobId: {SyncJobId}, " +
+                                            "SourceSysId: {SourceSysId}",
+                                            syncJob.Id,
+                                            createResult.SourceSysId);
+
+                                        continue;
+                                    }
+
+                                    // -------------------------------------
+                                    // 19. Save ServiceNow -> CM identity
+                                    // -------------------------------------
+                                    try
+                                    {
+                                        var syncedRecord =
+                                            new SyncedRecord(
+                                                integration.Id,
+                                                createResult.SourceSysId,
+                                                sourceRecordNumber,
+                                                createResult.RecordUri.Value,
+                                                createResult.RecordNumber);
+
+                                        await _syncedRecordRepository
+                                            .AddAsync(
+                                                syncedRecord,
+                                                cancellationToken);
+
+                                        result.TotalSucceeded++;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        result.TotalFailed++;
+
+                                        _logger.LogError(
+                                            ex,
+                                            "Sync tracking failed. " +
+                                            "SyncJobId: {SyncJobId}, " +
+                                            "SourceSysId: {SourceSysId}, " +
+                                            "CM URI: {RecordUri}",
+                                            syncJob.Id,
+                                            createResult.SourceSysId,
+                                            createResult.RecordUri);
+                                    }
+                                }
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                if (cmStopwatch.IsRunning)
+                                {
+                                    cmStopwatch.Stop();
                                 }
 
-                                // -------------------------------------
-                                // CONTENT MANAGER CREATION FAILURE
-                                // -------------------------------------
-                                if (!createResult.Success)
+                                throw;
+                            }
+                            catch (Exception ex) when (!cmResultsReturned)
+                            {
+                                if (cmStopwatch.IsRunning)
                                 {
+                                    cmStopwatch.Stop();
+                                }
+
+                                totalCmProcessingMilliseconds +=
+                                    cmStopwatch.ElapsedMilliseconds;
+
+                                // -----------------------------------------
+                                // CM batch failed before normal per-record
+                                // results were returned. Persist a failure
+                                // for every source record in this batch.
+                                // -----------------------------------------
+                                foreach (var sourceRecord in newRecords)
+                                {
+                                    string? sourceSysId = null;
+                                    string? sourceRecordNumber = null;
+
+                                    if (sourceRecord.TryGetValue(
+                                            "sys_id",
+                                            out var sysIdElement))
+                                    {
+                                        sourceSysId =
+                                            GetJsonValueAsString(
+                                                sysIdElement);
+                                    }
+
+                                    if (sourceRecord.TryGetValue(
+                                            "number",
+                                            out var numberElement))
+                                    {
+                                        sourceRecordNumber =
+                                            GetJsonValueAsString(
+                                                numberElement);
+                                    }
+
+                                    result.TotalProcessed++;
                                     result.TotalFailed++;
 
                                     await RecordFailureAsync(
@@ -667,7 +839,7 @@ namespace ServiceNowCM.Application.Services
                                             integration.Id,
 
                                         sourceSysId:
-                                            createResult.SourceSysId,
+                                            sourceSysId,
 
                                         sourceRecordNumber:
                                             sourceRecordNumber,
@@ -676,103 +848,50 @@ namespace ServiceNowCM.Application.Services
                                             "ContentManager",
 
                                         errorMessage:
-                                            string.IsNullOrWhiteSpace(
-                                                createResult.Message)
-                                                ? "Content Manager record creation failed."
-                                                : createResult.Message,
+                                            ex.Message,
 
                                         attemptNumber:
                                             1,
 
                                         contentManagerRecordUri:
-                                            createResult.RecordUri,
+                                            null,
 
                                         cancellationToken:
-                                            cancellationToken);
-
-                                    _logger.LogWarning(
-                                        "CM record creation failed. " +
-                                        "SyncJobId: {SyncJobId}, " +
-                                        "IntegrationId: {IntegrationId}, " +
-                                        "SourceSysId: {SourceSysId}, " +
-                                        "SourceRecordNumber: {SourceRecordNumber}, " +
-                                        "Error: {Error}",
-                                        syncJob.Id,
-                                        integration.Id,
-                                        createResult.SourceSysId,
-                                        sourceRecordNumber,
-                                        createResult.Message);
-
-                                    continue;
+                                            CancellationToken.None);
                                 }
 
-                                // -------------------------------------
-                                // CM succeeded but SourceSysId missing
-                                // -------------------------------------
-                                if (string.IsNullOrWhiteSpace(
-                                        createResult.SourceSysId))
-                                {
-                                    result.TotalFailed++;
+                                syncJob.UpdateCounters(
+                                    fetched:
+                                        result.TotalFetched,
 
-                                    _logger.LogWarning(
-                                        "CM record was created but SourceSysId " +
-                                        "was not returned. SyncJobId: {SyncJobId}",
-                                        syncJob.Id);
+                                    processed:
+                                        result.TotalProcessed,
 
-                                    continue;
-                                }
+                                    succeeded:
+                                        result.TotalSucceeded,
 
-                                // -------------------------------------
-                                // CM succeeded but RecordUri missing
-                                // -------------------------------------
-                                if (!createResult.RecordUri.HasValue)
-                                {
-                                    result.TotalFailed++;
+                                    skipped:
+                                        result.TotalSkipped,
 
-                                    _logger.LogWarning(
-                                        "CM result does not contain RecordUri. " +
-                                        "SyncJobId: {SyncJobId}, " +
-                                        "SourceSysId: {SourceSysId}",
-                                        syncJob.Id,
-                                        createResult.SourceSysId);
+                                    failed:
+                                        result.TotalFailed);
 
-                                    continue;
-                                }
+                                await _syncJobRepository
+                                    .UpdateAsync(
+                                        syncJob,
+                                        CancellationToken.None);
 
-                                // -------------------------------------
-                                // 19. Save ServiceNow -> CM identity
-                                // -------------------------------------
-                                try
-                                {
-                                    var syncedRecord =
-                                        new SyncedRecord(
-                                            integration.Id,
-                                            createResult.SourceSysId,
-                                            sourceRecordNumber,
-                                            createResult.RecordUri.Value,
-                                            createResult.RecordNumber);
+                                _logger.LogError(
+                                    ex,
+                                    "Content Manager batch processing failed. " +
+                                    "SyncJobId: {SyncJobId}, " +
+                                    "IntegrationId: {IntegrationId}, " +
+                                    "BatchRecords: {BatchRecords}",
+                                    syncJob.Id,
+                                    integration.Id,
+                                    newRecords.Count);
 
-                                    await _syncedRecordRepository
-                                        .AddAsync(
-                                            syncedRecord,
-                                            cancellationToken);
-
-                                    result.TotalSucceeded++;
-                                }
-                                catch (Exception ex)
-                                {
-                                    result.TotalFailed++;
-
-                                    _logger.LogError(
-                                        ex,
-                                        "Sync tracking failed. " +
-                                        "SyncJobId: {SyncJobId}, " +
-                                        "SourceSysId: {SourceSysId}, " +
-                                        "CM URI: {RecordUri}",
-                                        syncJob.Id,
-                                        createResult.SourceSysId,
-                                        createResult.RecordUri);
-                                }
+                                throw;
                             }
                         }
 

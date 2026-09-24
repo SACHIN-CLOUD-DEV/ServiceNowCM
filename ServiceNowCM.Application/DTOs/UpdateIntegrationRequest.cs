@@ -4,6 +4,8 @@
     {
         public string Name { get; set; } = string.Empty;
 
+        public long ServiceNowConnectionId { get; set; }
+
         public string TableName { get; set; } = string.Empty;
 
         public string? EncodedQuery { get; set; }

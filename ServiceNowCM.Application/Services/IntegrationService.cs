@@ -71,7 +71,8 @@ namespace ServiceNowCM.Application.Services
             await ValidateContentManagerTargetAsync(
                 request.ContentManagerConnectionId,
                 request.ContentManagerRecordTypeUri,
-                request.ContentManagerRecordTypeName);
+                request.ContentManagerRecordTypeName,
+                request.Fields);
 
             if (request.ContentManagerConnectionId.HasValue &&
             request.ContentManagerRecordTypeUri.HasValue &&
@@ -131,6 +132,16 @@ namespace ServiceNowCM.Application.Services
                     $"Integration with ID '{id}' was not found.");
             }
 
+            var serviceNowConnection =
+                await _serviceNowConnectionRepository.GetByIdAsync(
+                    request.ServiceNowConnectionId);
+
+            if (serviceNowConnection == null)
+            {
+                throw new KeyNotFoundException(
+                    $"ServiceNow connection with ID '{request.ServiceNowConnectionId}' was not found.");
+            }
+
             var nameExists =
                 await _integrationRepository.ExistsByNameAsync(
                     request.Name);
@@ -146,6 +157,15 @@ namespace ServiceNowCM.Application.Services
 
             ValidateFields(request.Fields);
 
+            await ValidateContentManagerTargetAsync(
+                request.ContentManagerConnectionId,
+                request.ContentManagerRecordTypeUri,
+                request.ContentManagerRecordTypeName,
+                request.Fields);
+
+            integration.SetServiceNowConnection(
+                request.ServiceNowConnectionId);
+
             integration.Update(
                 request.Name,
                 request.TableName,
@@ -154,11 +174,6 @@ namespace ServiceNowCM.Application.Services
                 request.ProcessingBatchSize,
                 request.DisplayValues,
                 request.ExcludeReferenceLinks);
-
-            await ValidateContentManagerTargetAsync(
-                request.ContentManagerConnectionId,
-                request.ContentManagerRecordTypeUri,
-                request.ContentManagerRecordTypeName);
 
             if (request.ContentManagerConnectionId.HasValue &&
                 request.ContentManagerRecordTypeUri.HasValue &&
@@ -262,6 +277,7 @@ namespace ServiceNowCM.Application.Services
             long? connectionId,
             long? recordTypeUri,
             string? recordTypeName,
+            IReadOnlyCollection<IntegrationFieldRequest> fields,
             CancellationToken cancellationToken = default)
         {
             var nothingProvided =
@@ -336,6 +352,55 @@ namespace ServiceNowCM.Application.Services
             {
                 throw new ArgumentException(
                     $"Record Type name '{recordTypeName}' does not match URI '{recordTypeUri.Value}'.");
+            }
+
+            // ---------------------------------------------------------
+            // Validate configured CM Additional Field mappings
+            // ---------------------------------------------------------
+            var additionalFieldMappings =
+                fields
+                    .Where(
+                        x => string.Equals(
+                            x.TargetFieldType,
+                            "AdditionalField",
+                            StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            if (additionalFieldMappings.Count == 0)
+            {
+                return;
+            }
+
+            var availableFields =
+                await _contentManagerClient.GetFieldsAsync(
+                    cmConnection,
+                    password,
+                    recordTypeUri.Value,
+                    cancellationToken);
+
+            foreach (var fieldMapping in additionalFieldMappings)
+            {
+                if (!fieldMapping.TargetFieldUri.HasValue)
+                {
+                    throw new ArgumentException(
+                        $"Content Manager Additional Field URI is required for " +
+                        $"ServiceNow field '{fieldMapping.SourceFieldName}'.");
+                }
+
+                var targetFieldExists =
+                    availableFields.Any(
+                        x => x.Uri ==
+                             fieldMapping.TargetFieldUri.Value);
+
+                if (!targetFieldExists)
+                {
+                    throw new ArgumentException(
+                        $"Content Manager Additional Field URI " +
+                        $"'{fieldMapping.TargetFieldUri.Value}' configured for " +
+                        $"ServiceNow field '{fieldMapping.SourceFieldName}' " +
+                        $"was not found on Record Type " +
+                        $"'{recordTypeName}' (URI {recordTypeUri.Value}).");
+                }
             }
         }
 
