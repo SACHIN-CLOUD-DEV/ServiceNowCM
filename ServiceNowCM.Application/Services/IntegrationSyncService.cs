@@ -131,6 +131,24 @@ namespace ServiceNowCM.Application.Services
             }
 
             // ---------------------------------------------------------
+            // Prevent concurrent synchronization for same Integration
+            // ---------------------------------------------------------
+            var hasRunningJob =
+                await _syncJobRepository
+                    .HasRunningJobAsync(
+                        integration.Id,
+                        cancellationToken);
+
+            if (hasRunningJob)
+            {
+                throw new InvalidOperationException(
+                    $"A synchronization job is already running " +
+                    $"for integration '{integration.Name}'. " +
+                    $"Wait for the current job to complete before " +
+                    $"starting another synchronization or resume.");
+            }
+
+            // ---------------------------------------------------------
             // 3. Determine NEW or RESUME execution
             // ---------------------------------------------------------
             var startingOffset = 0;

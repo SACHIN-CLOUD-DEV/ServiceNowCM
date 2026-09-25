@@ -16,6 +16,10 @@ public interface ISyncJobRepository
         long integrationId,
         CancellationToken cancellationToken = default);
 
+    Task<bool> HasRunningJobAsync(
+        long integrationId,
+        CancellationToken cancellationToken = default);
+
     Task UpdateAsync(
         SyncJob syncJob,
         CancellationToken cancellationToken = default);

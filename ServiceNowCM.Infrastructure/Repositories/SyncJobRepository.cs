@@ -77,6 +77,18 @@ public class SyncJobRepository : ISyncJobRepository
         return latestJob;
     }
 
+    public async Task<bool> HasRunningJobAsync(
+    long integrationId,
+    CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.SyncJobs
+            .AnyAsync(
+                x =>
+                    x.IntegrationId == integrationId &&
+                    x.Status == "Running",
+                cancellationToken);
+    }
+
     public async Task UpdateAsync(
         SyncJob syncJob,
         CancellationToken cancellationToken = default)
@@ -86,4 +98,6 @@ public class SyncJobRepository : ISyncJobRepository
         await _dbContext.SaveChangesAsync(
             cancellationToken);
     }
+
+    
 }

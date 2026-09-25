@@ -53,11 +53,22 @@ namespace ServiceNowCM.Infrastructure.Persistence.Configurations
                 .HasForeignKey(x => x.IntegrationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasIndex(x => x.IntegrationId);
+            // General-purpose indexes
+            builder.HasIndex(x => new
+            {
+                x.IntegrationId,
+                x.StartedAtUtc
+            }).HasDatabaseName("IX_SyncJobs_IntegrationId_StartedAtUtc");
 
             builder.HasIndex(x => x.Status);
 
             builder.HasIndex(x => x.StartedAtUtc);
+
+            builder.HasIndex(x => x.IntegrationId)
+                .HasDatabaseName(
+                    "UX_SyncJobs_IntegrationId_Running")
+                .IsUnique()
+                .HasFilter("[Status] = 'Running'");
         }
     }
 }
